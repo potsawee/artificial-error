@@ -5,11 +5,6 @@ from string import punctuation
 mypunc = punctuation.replace('.','').replace("'",'')
 
 
-model = UnigramModel()
-model.readin("/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/BULATS.gedx.ins.tsv")
-model.construct_model()
-
-
 def ami2gedtsv(ami, gedtsv):
     """
     original: the AMI corpus e.g. /home/dawna/meetings/ami/convert/lib/mlfs/train+sil.mlf
@@ -123,65 +118,109 @@ def ami2gedtsv(ami, gedtsv):
 
             file.write("{}\n".format(word))
 
+    print("{} done".format(myoutput[2]))
     # -------------------------------- #
-    return
     # ----------- ged.tsv ------------ #
-    #
-    # with open(myoutput[2], 'r') as file:
-    #     lines = file.readlines()
-    #
-    # err_count = 0
-    # good_count = 0
-    # insertion_count = 0
-    # deletion_count = 0
-    #
-    # with open(myoutput[2], 'w') as file:
-    #     is_deletion = False
-    #     for line in lines:
-    #
-    #         if line == '\n':
-    #             continue
-    #
-    #         token = line.strip()
-    #
-    #         emitted = model.emit(token)
-    #
-    #         # insertion
-    #         if(len(emitted.split()) >= 2):
-    #             is_deletion = False
-    #             x = emitted.split()
-    #             if(x[0] == token):
-    #                 file.write("{}\tc\n{}\ti\n".format(x[0],x[1]))
-    #             else:
-    #                 file.write("{}\ti\n{}\tc\n".format(x[0],x[1]))
-    #
-    #             insertion_count += 1
-    #             # continue
-    #
-    #         # deletion
-    #         elif '*' in emitted:
-    #             is_deletion = True
-    #             # continue
-    #             deletion_count += 1
-    #
-    #         # Ok or Substitution
-    #         else:
-    #             if token != emitted or is_deletion == True:
-    #                 file.write("{}\ti\n".format(emitted))
-    #                 err_count += 1
-    #             else:
-    #                 file.write("{}\tc\n".format(token))
-    #                 good_count +=1
-    #             is_deletion = False
-    #
-    # print("err_count:", err_count)
-    # print("good_count:", good_count)
 
+    with open(myoutput[2], 'r') as file:
+        lines = file.readlines()
+
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/master.gedx.ins.tsv"
+    print("Loading... {}".format(gedx_path))
+    model = UnigramModel()
+    model.readin(gedx_path)
+    model.construct_model()
+    print("Model built!")
+
+    sentences = []
+    sentence = [] # start with a word, end with a full stop
+                  # [('the', 'c'), ('cat', 'c'), ...]
+
+    deletion = "<DEL>"
+    sub_count = 0
+    ins_count = 0
+    del_count = 0
+    good_count = 0
+
+    for j, line in enumerate(lines):
+
+        # counting
+        if j % 50000 == 0:
+            print('#', end='')
+            sys.stdout.flush()
+
+        if line == '\n':
+            sentences.append(sentence)
+            sentence = []
+            continue
+
+        token = line.strip()
+        emitted = model.emit(token)
+
+        # insertion
+        if(len(emitted.split()) >= 2):
+            x = emitted.split()
+            if(x[0] == token):
+                sentence.append((x[0], 'c'))
+                sentence.append((x[1], 'i'))
+            else:
+                sentence.append((x[0], 'i'))
+                sentence.append((x[1], 'c'))
+            ins_count += 1
+
+        # deletion
+        elif '*' in emitted:
+            sentence.append((deletion, 'i'))
+            del_count += 1
+
+        # Substitution or No-error
+        else:
+            # Substitution
+            if token != emitted:
+                sentence.append((emitted, 'i'))
+                sub_count += 1
+
+            # No-error
+            else:
+                sentence.append((token, 'c'))
+                good_count +=1
+
+
+    print("\n")
+    print("good_count:", good_count)
+    print("sub_count:", sub_count)
+    print("ins_count:", ins_count)
+    print("del_count:", del_count)
+
+    with open(myoutput[3], 'w') as file:
+        for sentence in sentences:
+            idx = 0
+            while(idx < len(sentence)):
+                word = sentence[idx]
+                if word[0] != deletion:
+                    file.write("{}\t{}\n".format(word[0], word[1]))
+                else:
+                    idx += 1
+                    if(idx < len(sentence)):
+                        word = sentence[idx]
+                        file.write("{}\ti\n".format(word[0]))
+                    else:
+                        pass
+                idx += 1
+            file.write("\n")
+
+    print("{} done".format(myoutput[3]))
+    print("------ Summary ------")
+    print("num_words = {}".format(good_count+sub_count+ins_count+del_count))
+    print("%error = {:.2f}".format(sub_count+ins_count+del_count/good_count*100))
+    print("%sub = {:.2f}".format(sub_count/good_count*100))
+    print("%ins = {:.2f}".format(ins_count/good_count*100))
+    print("%del = {:.2f}".format(del_count/good_count*100))
 
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-monday"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-monday2"
     ami2gedtsv(path1,path2)
 
 def test1():

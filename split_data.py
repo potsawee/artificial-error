@@ -1,9 +1,23 @@
+import sys
 import random
 
 def main():
-    path = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami1.ged.tsv'
+    if(len(sys.argv) != 4):
+        print("Usage: python3 split_data.py orig tgt name")
 
-    with open(path, 'r') as file:
+    # orig = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-monday2.ged.tsv'
+    # path_train = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami-monday2.train.ged.tsv'
+    # path_dev = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami-monday2.dev.ged.tsv'
+    # path_test = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami-monday2.test.ged.tsv'
+    orig = sys.argv[1]
+    tgt = sys.argv[2]
+    name = sys.argv[3]
+    path_train = tgt + name + '.train.ged.tsv'
+    path_dev = tgt + name + '.dev.ged.tsv'
+    path_dev = tgt + name + '.test.ged.tsv'
+
+
+    with open(orig, 'r') as file:
         lines = file.readlines()
 
     sentences = []
@@ -21,10 +35,6 @@ def main():
 
     # print(len(sentences))
     # print(sentences[:3])
-
-    path_train = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami1.train.ged.tsv'
-    path_dev = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami1.dev.ged.tsv'
-    path_test = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami1.test.ged.tsv'
 
     # Test set
     with open(path_test, 'w') as file:
