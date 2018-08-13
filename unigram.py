@@ -41,10 +41,6 @@ class UnigramModel(object):
                 except:
                     print(idx, line)
 
-                # unigram model can't capture 'insertion'
-                # if '*' in r:
-                #     continue
-
                 if r not in self.words_count:
                     self.words_count[r] = 1
                 else:
@@ -154,7 +150,7 @@ def test1():
     pdb.set_trace()
     pass
 
-def test2():
+def ins():
     input = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/gedx-tsv/master.gedx.tsv"
     output = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/gedx-tsv/master.gedx.ins.tsv"
     UnigramModel.handle_insertion(input, output)
@@ -165,7 +161,7 @@ def main():
     arg1 = sys.argv[1]
     if arg1 == 'test1':
         test1()
-    elif arg1 == 'test2':
-        test2()
+    elif arg1 == 'ins':
+        ins()
 if __name__ == "__main__":
     main()

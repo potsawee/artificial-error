@@ -4,7 +4,7 @@ def main():
     # path = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami1.train.ged.tsv'
     if len(sys.argv) > 1:
         path = sys.argv[1]
-
+    zero = 0
     one = 0
     two = 0
     three = 0
@@ -14,7 +14,7 @@ def main():
         for line in file:
             n = len(line.split())
             if n == 0:
-                pass
+                zero += 1
             elif n == 1:
                 one += 1
             elif n == 2:
@@ -25,6 +25,7 @@ def main():
                 four += 1
             else:
                 fivemore += 1
+    print("zero: ", zero)
     print("one: ", one)
     print("two: ", two)
     print("three: ", three)
