@@ -4,9 +4,9 @@ hesitation_list = \
     'UH','UMS','UM','UUUHHHH','HUH','HUM',
     'AH','AA','AAAHHH','AAM','AMM','AAMMM',
     'MM','HMM','ER','ERM','ERR','ERRR','EHM',
-    'EH','EM','AHEM'
+    'EH','EM','AHEM',
 # additional hesitation found in the AMI corpus
-    'HM', 'UMM', 'MM-HMM', 'UH-HUH'
+    'HM', 'UMM', 'MM-HMM', 'UH-HUH', 'MH'
 ]
 special_tokens = \
 [
@@ -14,6 +14,12 @@ special_tokens = \
 "<gap>", "<cough>", "<vocal>", "<sigh>", "<singing>",
 "<sound>", "<noise>", "<unknown>"
 ]
+
+special_tokens_cst = \
+[
+"[noise]", "[laughter]", "[vocalized-noise]"
+]
+
 short_form_dict = \
 {
     "\\'kay": "okay",
@@ -33,6 +39,8 @@ short_form_dict = \
     "\\'round": "around",
     "\\'d": "'d"
 }
+
+
 
 
 # ------ US => UK spelling ------ #
@@ -69,7 +77,7 @@ def convert_short_form(token):
 
 def us_to_uk_spelling(word):
     if word in us_to_uk_dict:
-        print("US_to_UK: {} => {}".format(word, us_to_uk_dict[word]))
+        # print("US_to_UK: {} => {}".format(word, us_to_uk_dict[word]))
         return us_to_uk_dict[word]
     else:
         return word
@@ -91,3 +99,14 @@ def split_word(word):
                 return word.strip("'")
     else:
         return
+
+
+
+
+#### CST Functions ####
+def is_special_token_cst(token):
+
+    if token in special_tokens_cst:
+        return True
+    else:
+        return False

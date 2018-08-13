@@ -2,8 +2,6 @@ import sys
 from unigram import UnigramModel
 from data_processing import *
 from string import punctuation
-mypunc = punctuation.replace('.','').replace("'",'')
-
 
 def ami2gedtsv(ami, gedtsv):
     """
@@ -142,6 +140,9 @@ def ami2gedtsv(ami, gedtsv):
     del_count = 0
     good_count = 0
 
+    print("len(lines) =", len(lines))
+    print("{}|100%".format(' '*int(len(lines)/50000)))
+
     for j, line in enumerate(lines):
 
         # counting
@@ -220,7 +221,7 @@ def ami2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-monday2"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami-monday3"
     ami2gedtsv(path1,path2)
 
 def test1():
@@ -240,6 +241,7 @@ def test1():
         print(line)
 
 def test2():
+    mypunc = punctuation.replace('.','').replace("'",'')
     path= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami.2.ged.tsv"
     mylist = []
     with open(path, 'r') as file:

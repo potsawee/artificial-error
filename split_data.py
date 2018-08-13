@@ -14,7 +14,7 @@ def main():
     name = sys.argv[3]
     path_train = tgt + name + '.train.ged.tsv'
     path_dev = tgt + name + '.dev.ged.tsv'
-    path_dev = tgt + name + '.test.ged.tsv'
+    path_test = tgt + name + '.test.ged.tsv'
 
 
     with open(orig, 'r') as file:
