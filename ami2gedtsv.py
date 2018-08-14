@@ -7,6 +7,7 @@ def ami2gedtsv(ami, gedtsv):
     """
     original: the AMI corpus e.g. /home/dawna/meetings/ami/convert/lib/mlfs/train+sil.mlf
     work1:    transcription => tsv format & hesitation => <hesitation>
+                - ignore fullstops
     work2:    text processing
                 1. mispronunciation
                 2. short form e.g. 'kay => okay
@@ -30,8 +31,9 @@ def ami2gedtsv(ami, gedtsv):
         for line in lines[1:]:
             if line[:3] == '"*/':
                 continue
-            if line == '.\n':
-                file.write('.\n\n')
+            if line == '.\n': # end of a sentence
+                # file.write('.\n\n')
+                file.write('\n')
                 continue
 
             token = line.strip()
@@ -123,7 +125,7 @@ def ami2gedtsv(ami, gedtsv):
     with open(myoutput[2], 'r') as file:
         lines = file.readlines()
 
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/master.gedx.ins.tsv"
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     model = UnigramModel()
     model.readin(gedx_path)
@@ -213,7 +215,7 @@ def ami2gedtsv(ami, gedtsv):
     print("{} done".format(myoutput[3]))
     print("------ Summary ------")
     print("num_words = {}".format(good_count+sub_count+ins_count+del_count))
-    print("%error = {:.2f}".format(sub_count+ins_count+del_count/good_count*100))
+    print("%error = {:.2f}".format((sub_count+ins_count+del_count)/good_count*100))
     print("%sub = {:.2f}".format(sub_count/good_count*100))
     print("%ins = {:.2f}".format(ins_count/good_count*100))
     print("%del = {:.2f}".format(del_count/good_count*100))
@@ -221,7 +223,7 @@ def ami2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami-monday3"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4"
     ami2gedtsv(path1,path2)
 
 def test1():

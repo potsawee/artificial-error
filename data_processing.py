@@ -15,7 +15,7 @@ special_tokens = \
 "<sound>", "<noise>", "<unknown>"
 ]
 
-special_tokens_cst = \
+special_tokens_cts = \
 [
 "[noise]", "[laughter]", "[vocalized-noise]"
 ]
@@ -103,10 +103,10 @@ def split_word(word):
 
 
 
-#### CST Functions ####
-def is_special_token_cst(token):
+#### CTS Functions ####
+def is_special_token_cts(token):
 
-    if token in special_tokens_cst:
+    if token in special_tokens_cts:
         return True
     else:
         return False
