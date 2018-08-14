@@ -151,8 +151,8 @@ def test1():
     pass
 
 def ins():
-    input = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/gedx-tsv/master.gedx.tsv"
-    output = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/gedx-tsv/master.gedx.ins.tsv"
+    input = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.tsv"
+    output = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     UnigramModel.handle_insertion(input, output)
 
 def main():

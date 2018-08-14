@@ -4,6 +4,7 @@ import random
 def main():
     if(len(sys.argv) != 4):
         print("Usage: python3 split_data.py orig tgt name")
+        return
 
     # orig = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-monday2.ged.tsv'
     # path_train = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/tsv/ami-monday2.train.ged.tsv'
@@ -39,24 +40,30 @@ def main():
     # Test set
     with open(path_test, 'w') as file:
         for sentence in sentences[:2500]:
+            if len(sentence) < 1:
+                continue
             file.write(".\tc\n")
             for line in sentence:
                 file.write(line)
-            file.write('\n')
+            file.write(".\tc\n\n")
     # Dev set
     with open(path_dev, 'w') as file:
         for sentence in sentences[2500:5000]:
+            if len(sentence) < 1:
+                continue
             file.write(".\tc\n")
             for line in sentence:
                 file.write(line)
-            file.write('\n')
+            file.write(".\tc\n\n")
     # Train set
     with open(path_train, 'w') as file:
         for sentence in sentences[5000:]:
+            if len(sentence) < 1:
+                continue
             file.write(".\tc\n")
             for line in sentence:
                 file.write(line)
-            file.write('\n')
+            file.write(".\tc\n\n")
 
 
 if __name__ == "__main__":

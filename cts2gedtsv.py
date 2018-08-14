@@ -49,7 +49,8 @@ def cts2gedtsv(ami, gedtsv):
                         file.write("{}\n".format(token.lower()))
                     else:
                         pass
-            file.write(".\n\n")
+            # file.write(".\n\n")
+            file.write("\n")
     print("{} done".format(myoutput[0]))
     # -------------------------------- #
 
@@ -184,7 +185,7 @@ def cts2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts1-log"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4"
     cts2gedtsv(path1,path2)
 
 

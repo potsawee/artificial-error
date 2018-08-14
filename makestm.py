@@ -31,6 +31,14 @@ def convert(orig, stm):
     with open(stm, 'w') as file:
         for id, words in dict.items():
             sentence = ' '.join(words)
+
+            # ; causes the mis-alignment problem --- @potsawee 14 Aug 2018
+            sentence = sentence.replace(" ;", " ,")
+            sentence = sentence.replace("(", "")
+            sentence = sentence.replace(")", "")
+            if sentence == "":
+                sentence = "*emp*"
+
             file.write("{} 1 aggregate 0.000 80.000 {}\n".format(id, sentence))
 
 def main():
