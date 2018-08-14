@@ -2,12 +2,12 @@ import sys
 from unigram import UnigramModel
 from data_processing import *
 
-# CST = Conversational Telephone Speech
+# CTS = Conversational Telephone Speech
 # There are about 3 million words
 
-def cst2gedtsv(ami, gedtsv):
+def cts2gedtsv(ami, gedtsv):
     """
-    original: the CST corpus e.g. /home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text
+    original: the CTS corpus e.g. /home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text
 
     sw02001-A_001980-002131 um-hum
     sw02001-A_002736-002893 and is
@@ -36,7 +36,7 @@ def cst2gedtsv(ami, gedtsv):
             items = line.split()
             for token in items[1:]:
 
-                if is_special_token_cst(token):
+                if is_special_token_cts(token):
                     continue
 
                 if '-' in token:
@@ -87,7 +87,7 @@ def cst2gedtsv(ami, gedtsv):
     with open(myoutput[1], 'r') as file:
         lines = file.readlines()
 
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/master.gedx.ins.tsv"
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     model = UnigramModel()
     model.readin(gedx_path)
@@ -177,15 +177,15 @@ def cst2gedtsv(ami, gedtsv):
     print("{} done".format(myoutput[2]))
     print("------ Summary ------")
     print("num_words = {}".format(good_count+sub_count+ins_count+del_count))
-    print("%error = {:.2f}".format(sub_count+ins_count+del_count/good_count*100))
+    print("%error = {:.2f}".format((sub_count+ins_count+del_count)/good_count*100))
     print("%sub = {:.2f}".format(sub_count/good_count*100))
     print("%ins = {:.2f}".format(ins_count/good_count*100))
     print("%del = {:.2f}".format(del_count/good_count*100))
 
 def main():
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cst-work/cst1-log"
-    cst2gedtsv(path1,path2)
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts1-log"
+    cts2gedtsv(path1,path2)
 
 
 if __name__ == "__main__":
