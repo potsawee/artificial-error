@@ -158,7 +158,11 @@ def ami2gedtsv(ami, gedtsv):
             continue
 
         token = line.strip()
+
+        # No error boosting
         emitted = model.emit(token)
+        # With error boosting
+        # emitted = model.emit(token, gain=1.2)
 
         # insertion
         if(len(emitted.split()) >= 2):
@@ -223,7 +227,7 @@ def ami2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4-boost"
     ami2gedtsv(path1,path2)
 
 def test1():

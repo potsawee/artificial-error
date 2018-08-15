@@ -74,16 +74,34 @@ class UnigramModel(object):
         return self.pairs_count[(r,h)] / self.words_count[r]
 
     # Propagate error
-    def emit(self, word):
+    def emit(self, word, gain=None):
         """
         Emit a word according to the probability distribution
         of the unigram model
         e.g. P(cat->cats) = 0.2
+
+        => gain: pmf'(!same) = min[gain x pmf(!same), 1]
+                 pmf'(same)  = 1 - pmf'(!same)
         """
         if word not in self.pmf:
             return word
         else:
-            x = np.random.choice([word]+self.words_dict[word], size=1, p=self.pmf[word])
+            if gain == None:
+                x = np.random.choice([word]+self.words_dict[word], size=1, p=self.pmf[word])
+            else:
+                new_pmf = []
+                boosted = [gain * p for p in self.pmf[word][1:]]
+                if sum(boosted) < 1.0:
+                    new_pmf.append(1.0-sum(boosted))
+                    new_pmf += boosted
+
+                else: # gain is too large
+                    factor = 1.0 / sum(self.pmf[word][1:])
+                    new_pmf.append(0.0)
+                    new_pmf += [factor * p for p in self.pmf[word][1:]]
+
+                x = np.random.choice([word]+self.words_dict[word], size=1, p=new_pmf)
+
         return x[0]
 
     # Print methods - debugging etc.
