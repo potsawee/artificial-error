@@ -67,8 +67,14 @@ class UnigramModel(object):
                 sum_prob += prob
                 self.transition_probs[(w1,w2)] = prob
                 self.pmf[w1].append(prob)
-            self.transition_probs[(w1,w1)] = 1-sum_prob
-            self.pmf[w1] = [1-sum_prob] + self.pmf[w1]
+            # this sum_prob is the probability that the word changes
+            # so if it is more than one, something went wrong => do not build the pmf
+            if sum_prob > 1.0:
+                self.transition_probs[(w1,w1)] = 0
+                del self.pmf[w1]
+            else:
+                self.transition_probs[(w1,w1)] = 1-sum_prob
+                self.pmf[w1] = [1-sum_prob] + self.pmf[w1]
 
     def prob(self, r, h):
         return self.pairs_count[(r,h)] / self.words_count[r]
@@ -87,7 +93,11 @@ class UnigramModel(object):
             return word
         else:
             if gain == None:
+                # try:
                 x = np.random.choice([word]+self.words_dict[word], size=1, p=self.pmf[word])
+                # except ValueError:
+                #     print("PMF-ERROR: {} - sum(pmf) = {}, pmf = {}".format(word, sum(self.pmf[word]),self.pmf[word]))
+                #     return word
             else:
                 new_pmf = []
                 boosted = [gain * p for p in self.pmf[word][1:]]
