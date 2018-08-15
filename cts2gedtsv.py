@@ -7,6 +7,9 @@ from data_processing import *
 
 def cts2gedtsv(ami, gedtsv):
     """
+
+    This script is for processing the 'Switchboard' CTS corpus.
+
     original: the CTS corpus e.g. /home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text
 
     sw02001-A_001980-002131 um-hum
@@ -121,7 +124,11 @@ def cts2gedtsv(ami, gedtsv):
             continue
 
         token = line.strip()
+
+        # No error boosting
         emitted = model.emit(token)
+        # With error boosting
+        # emitted = model.emit(token, gain=1.2)
 
         # insertion
         if(len(emitted.split()) >= 2):
@@ -185,7 +192,7 @@ def cts2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4-boost"
     cts2gedtsv(path1,path2)
 
 
