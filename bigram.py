@@ -1,0 +1,102 @@
+import sys
+import numpy as np
+from operator import itemgetter
+import pdb
+from tqdm import tqdm
+
+class BigramModel(object):
+    def __init__(self):
+        self.bigrams_count = {}             # bigrams_count[(I,sing)] = 100
+        self.bigram_pairs_count = {}        # bigram_pairs_count[ ( (I,sing) , (I,sings) ) ] = 5
+        self.bigrams_dict = {}              # bigrams_dict[(I,sing)] = [(I,sings), (I,****), (I,sang), ...]  ... not contain itself
+        self.transition_probs = {}          # transition_probs[((I,sing),(I,sings))] = P((I,sing)->(I,sings)) = 0.05
+        self.pmf = {}                       # pmf[(I,sing)] = [P((I,sing)->(I,sing)), P((I,sing)->each bigram in bigrams dict)] ... sum this must be 1
+        self.filepath = None
+
+    # Building a Bigram Model
+    def readin(self, filepath):
+        self.filepath = filepath
+
+    def construct_model(self):
+        self.count_bigrams()
+        self.build_transition_probs()
+
+    def count_bigrams(self):
+        with open(self.filepath, 'r') as file:
+            lines = file.readlines()
+
+        # reference bigram - correct (r0,r1)
+        bigram_r = None
+        # hypothesis bigram - incorrect (h0,h1)
+        bigram_h = None
+        # label
+        l0 = None
+        l1 = None
+
+        for idx in tqdm(range(len(lines)-1)):
+            line0 = lines[idx]
+            line1 = lines[idx+1]
+
+            if line0 == '\n' or line1 == '\n':
+                continue
+
+            items0 = line0.split('\t')
+            try:
+                r0 = items0[0].lower()
+                h0 = items0[1].lower()
+                l0 = items0[-1].strip()
+            except:
+                print(idx, line0)
+
+            items1 = line1.split('\t')
+            try:
+                r1 = items1[0].lower()
+                h1 = items1[1].lower()
+                l1 = items1[-1].strip()
+            except:
+                print(idx+1, line1)
+
+            bigram_r = (r0,r1)
+            bigram_h = (h0,h1)
+
+            if bigram_r not in self.bigrams_count:
+                self.bigrams_count[bigram_r] = 1
+            else:
+                self.bigrams_count[bigram_r] += 1
+
+            if l0 == 'i' or l1 == 'i':
+                if (bigram_r,bigram_h) not in self.bigram_pairs_count:
+                    self.bigram_pairs_count[(bigram_r,bigram_h)] = 1
+                else:
+                    self.bigram_pairs_count[(bigram_r,bigram_h)] += 1
+
+                if bigram_r not in self.bigrams_dict:
+                    self.bigrams_dict[bigram_r] = [bigram_h]
+                else:
+                    if bigram_h not in self.bigrams_dict[bigram_r]:
+                        self.bigrams_dict[bigram_r].append(bigram_h)
+
+    def build_transition_probs(self):
+        for bigram1, v in self.bigrams_dict.items():
+            sum_prob = 0
+            self.pmf[bigram1] = []
+            for bigram2 in v:
+                prob = self.prob(bigram1,bigram2)
+                sum_prob += prob
+                self.transition_probs[(bigram1,bigram2)] = prob
+                self.pmf[bigram1].append(prob)
+            # this sum_prob is the probability that the word changes
+            # so if it is more than one, something went wrong => do not build the pmf
+            if sum_prob > 1.0:
+                self.transition_probs[(bigram1,bigram1)] = 0
+                del self.pmf[bigram1]
+            else:
+                self.transition_probs[(bigram1,bigram1)] = 1-sum_prob
+                self.pmf[bigram1] = [1-sum_prob] + self.pmf[bigram1]
+
+    def prob(self, bigram_r, bigram_h):
+        return self.bigram_pairs_count[(bigram_r,bigram_h)] / self.bigrams_count[bigram_r]
+
+    # Propagate error
+    def emit(self, bigram, gain=None):
+        pass
