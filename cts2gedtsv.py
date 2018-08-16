@@ -5,7 +5,7 @@ from data_processing import *
 # CTS = Conversational Telephone Speech
 # There are about 3 million words
 
-def cts2gedtsv(ami, gedtsv):
+def cts2gedtsv(cts, gedtsv):
     """
 
     This script is for processing the 'Switchboard' CTS corpus.
@@ -23,7 +23,7 @@ def cts2gedtsv(ami, gedtsv):
                 3. split multiple words
                 4. parital word e.g. spee-
     work3:    more complicated text processing
-                1. US spelling => UK spelling
+                ### 1. US spelling => UK spelling !!! DTAL has both spelling
                 2. Tokenisation e.g. don't => do n't // it's => it 's
     ged.tsv:  corrput the corpus using statistics from the model
     """
@@ -32,7 +32,7 @@ def cts2gedtsv(ami, gedtsv):
                 gedtsv+'.work3.ged.tsv', gedtsv+'.ged.tsv']
 
     # ------------ Work 12 ------------ #
-    with open(ami, 'r') as file:
+    with open(cts, 'r') as file:
         lines = file.readlines()
     with open(myoutput[0], 'w') as file:
         for line in lines:
@@ -72,7 +72,7 @@ def cts2gedtsv(ami, gedtsv):
             word = line.strip()
 
             # US to UK spelling
-            word = us_to_uk_spelling(word)
+            # word = us_to_uk_spelling(word)
 
             # tokenisation
             if "'" in word:
@@ -192,7 +192,7 @@ def cts2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4-boost"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts5"
     cts2gedtsv(path1,path2)
 
 

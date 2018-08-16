@@ -16,7 +16,7 @@ def ami2gedtsv(ami, gedtsv):
                 5. just \
                 6. remove special tokens
     work3:    more complicated text processing
-                1. US spelling => UK spelling
+                ### 1. US spelling => UK spelling !!! DTAL has both spelling
                 2. Tokenisation e.g. don't => do n't // it's => it 's
     ged.tsv:  corrput the corpus using statistics from the model
     """
@@ -107,7 +107,7 @@ def ami2gedtsv(ami, gedtsv):
             word = line.strip()
 
             # US to UK spelling
-            word = us_to_uk_spelling(word)
+            # word = us_to_uk_spelling(word)
 
             # tokenisation
             if "'" in word:
@@ -227,7 +227,7 @@ def ami2gedtsv(ami, gedtsv):
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4-boost"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami5"
     ami2gedtsv(path1,path2)
 
 def test1():

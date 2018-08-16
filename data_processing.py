@@ -6,7 +6,10 @@ hesitation_list = \
     'MM','HMM','ER','ERM','ERR','ERRR','EHM',
     'EH','EM','AHEM',
 # additional hesitation found in the AMI corpus
-    'HM', 'UMM', 'MM-HMM', 'UH-HUH', 'MH'
+    'HM', 'UMM', 'MM-HMM', 'UH-HUH', 'MH',
+# additional hesitation found in the Fisher CTS corpus
+    'OH', 'UH-HUH', 'UH-OH',
+    'ACH', 'EEE', 'EW', 'HEE', 'HA'
 ]
 special_tokens = \
 [
@@ -40,19 +43,32 @@ short_form_dict = \
     "\\'d": "'d"
 }
 
+pw_fisher = \
+{
+    "-kay": "okay",
+    "-em": "them",
+    "-bout": "about",
+    "-cause": "because",
+    "-til": "until",
+    "-till": "until",
+    "-scuse": "excuse",
 
+}
 
 
 # ------ US => UK spelling ------ #
 path_to_us = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/wlists/us_spellings.txt"
 path_to_uk = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/wlists/uk_spellings.txt"
 us_to_uk_dict = {}
+uk_to_us_dict = {}
 with open(path_to_us, 'r') as file:
     us_wlist = file.readlines()
 with open(path_to_uk, 'r') as file:
     uk_wlist = file.readlines()
 for us_word, uk_word in zip(us_wlist, uk_wlist):
     us_to_uk_dict[us_word.strip()] = uk_word.strip()
+for us_word, uk_word in zip(us_wlist, uk_wlist):
+    uk_to_us_dict[uk_word.strip()] = us_word.strip()
 
 
 def is_hesitation(token):
@@ -77,7 +93,7 @@ def convert_short_form(token):
 
 def us_to_uk_spelling(word):
     if word in us_to_uk_dict:
-        # print("US_to_UK: {} => {}".format(word, us_to_uk_dict[word]))
+        print("US_to_UK: {} => {}".format(word, us_to_uk_dict[word]))
         return us_to_uk_dict[word]
     else:
         return word
@@ -110,3 +126,10 @@ def is_special_token_cts(token):
         return True
     else:
         return False
+
+#### Fisher Functions ####
+def keep_pw_fisher(token):
+    if token in pw_fisher:
+        return pw_fisher[token]
+    else:
+        return "<partial>"
