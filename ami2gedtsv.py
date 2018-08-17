@@ -1,9 +1,12 @@
 import sys
-from unigram import UnigramModel
+from sequencemodel import UnigramModel
+from sequencemodel import BigramModel
 from data_processing import *
 from string import punctuation
+from tqdm import tqdm
 
-def ami2gedtsv(ami, gedtsv):
+
+def ami2gedtsv(ami, gedtsv, model_type):
     """
     original: the AMI corpus e.g. /home/dawna/meetings/ami/convert/lib/mlfs/train+sil.mlf
     work1:    transcription => tsv format & hesitation => <hesitation>
@@ -107,7 +110,7 @@ def ami2gedtsv(ami, gedtsv):
             word = line.strip()
 
             # US to UK spelling
-            # word = us_to_uk_spelling(word)
+            word = us_to_uk_spelling(word) #version4
 
             # tokenisation
             if "'" in word:
@@ -127,7 +130,17 @@ def ami2gedtsv(ami, gedtsv):
 
     gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
-    model = UnigramModel()
+    # ----- Model selection ----- #
+    # Unigram
+    if model_type == 'unigram':
+        model = UnigramModel()
+
+    # Bigram
+    elif model_type == 'bigram':
+        start_tag = "<s>"
+        token = start_tag
+        model = BigramModel()
+    # -------------------------- #
     model.readin(gedx_path)
     model.construct_model()
     print("Model built!")
@@ -142,27 +155,39 @@ def ami2gedtsv(ami, gedtsv):
     del_count = 0
     good_count = 0
 
-    print("len(lines) =", len(lines))
-    print("{}|100%".format(' '*int(len(lines)/50000)))
+    print("Propagating the errors...")
+    for idx in tqdm(range(len(lines))):
+        line = lines[idx]
+        # ------------- Unigram ------------- #
+        if model_type == 'unigram':
+            if line == '\n':
+                sentences.append(sentence)
+                sentence = []
+                continue
 
-    for j, line in enumerate(lines):
+            token = line.strip()
 
-        # counting
-        if j % 50000 == 0:
-            print('#', end='')
-            sys.stdout.flush()
+            # No error boosting
+            emitted = model.emit(token)
+            # With error boosting
+            # emitted = model.emit(token, gain=1.2)
+        # ----------------------------------- #
 
-        if line == '\n':
-            sentences.append(sentence)
-            sentence = []
-            continue
+        # ------------- Bigram -------------- #
+        elif model_type == 'bigram':
+            if line == '\n':
+                sentences.append(sentence)
+                sentence = []
+                token = start_tag
+                continue
 
-        token = line.strip()
+            prev_token = token
+            token = line.strip()
+            bigram = (prev_token,token)
 
-        # No error boosting
-        emitted = model.emit(token)
-        # With error boosting
-        # emitted = model.emit(token, gain=1.2)
+            emitted = model.emit(bigram)
+        # ----------------------------------- #
+
 
         # insertion
         if(len(emitted.split()) >= 2):
@@ -192,8 +217,6 @@ def ami2gedtsv(ami, gedtsv):
                 sentence.append((token, 'c'))
                 good_count +=1
 
-
-    print("\n")
     print("good_count:", good_count)
     print("sub_count:", sub_count)
     print("ins_count:", ins_count)
@@ -226,41 +249,20 @@ def ami2gedtsv(ami, gedtsv):
 
 
 def main():
+    if(len(sys.argv) != 2):
+        print("Usage: python3 ami2gedtsv.py [unigram/bigram]")
+        return
+
+    model_type = sys.argv[1].lower()
+
+    if model_type not in ['unigram', 'bigram']:
+        print("model type error")
+        return
+
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami5"
-    ami2gedtsv(path1,path2)
+    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4.bigram"
+    ami2gedtsv(path1, path2, model_type)
 
-def test1():
-    """
-    Found:
-    <other> <hesitation> <disfluency> <laugh>
-    <gap> <cough> <vocal> <sigh> <singing> <sound> <noise>
-    """
-    path= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami.ged"
-    with open(path, 'r') as f:
-        mylist = []
-        for line in f:
-            if '<' in line or '>' in line:
-                if line.strip() not in mylist:
-                    mylist.append(line.strip())
-    for line in mylist:
-        print(line)
 
-def test2():
-    mypunc = punctuation.replace('.','').replace("'",'')
-    path= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami.2.ged.tsv"
-    mylist = []
-    with open(path, 'r') as file:
-        for line in file:
-            for c in line.strip():
-                if c in mypunc:
-                    if line.strip() not in mylist:
-                        mylist.append(line.strip())
-    for item in mylist:
-        print(item)
 if __name__ == "__main__":
-    if(len(sys.argv) == 1):
-        main()
-    else:
-        # test1()
-        test2()
+    main()

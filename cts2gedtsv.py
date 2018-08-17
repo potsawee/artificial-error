@@ -1,11 +1,13 @@
 import sys
-from unigram import UnigramModel
+from sequencemodel import UnigramModel
+from sequencemodel import BigramModel
 from data_processing import *
+from tqdm import tqdm
 
 # CTS = Conversational Telephone Speech
 # There are about 3 million words
 
-def cts2gedtsv(cts, gedtsv):
+def cts2gedtsv(cts, gedtsv, model_type):
     """
 
     This script is for processing the 'Switchboard' CTS corpus.
@@ -72,7 +74,7 @@ def cts2gedtsv(cts, gedtsv):
             word = line.strip()
 
             # US to UK spelling
-            # word = us_to_uk_spelling(word)
+            word = us_to_uk_spelling(word) #version4
 
             # tokenisation
             if "'" in word:
@@ -93,7 +95,17 @@ def cts2gedtsv(cts, gedtsv):
 
     gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
-    model = UnigramModel()
+    # ----- Model selection ----- #
+    # Unigram
+    if model_type == 'unigram':
+        model = UnigramModel()
+
+    # Bigram
+    elif model_type == 'bigram':
+        start_tag = "<s>"
+        token = start_tag
+        model = BigramModel()
+    # -------------------------- #
     model.readin(gedx_path)
     model.construct_model()
     print("Model built!")
@@ -108,27 +120,38 @@ def cts2gedtsv(cts, gedtsv):
     del_count = 0
     good_count = 0
 
-    print("len(lines) =", len(lines))
-    print("{}|100%".format(' '*int(len(lines)/50000)))
+    print("Propagating the errors...")
+    for idx in tqdm(range(len(lines))):
+        line = lines[idx]
+        # ------------- Unigram ------------- #
+        if model_type == 'unigram':
+            if line == '\n':
+                sentences.append(sentence)
+                sentence = []
+                continue
 
-    for j, line in enumerate(lines):
+            token = line.strip()
 
-        # counting
-        if j % 50000 == 0:
-            print('#', end='')
-            sys.stdout.flush()
+            # No error boosting
+            emitted = model.emit(token)
+            # With error boosting
+            # emitted = model.emit(token, gain=1.2)
+        # ----------------------------------- #
 
-        if line == '\n':
-            sentences.append(sentence)
-            sentence = []
-            continue
+        # ------------- Bigram -------------- #
+        elif model_type == 'bigram':
+            if line == '\n':
+                sentences.append(sentence)
+                sentence = []
+                token = start_tag
+                continue
 
-        token = line.strip()
+            prev_token = token
+            token = line.strip()
+            bigram = (prev_token,token)
 
-        # No error boosting
-        emitted = model.emit(token)
-        # With error boosting
-        # emitted = model.emit(token, gain=1.2)
+            emitted = model.emit(bigram)
+        # ----------------------------------- #
 
         # insertion
         if(len(emitted.split()) >= 2):
@@ -158,8 +181,6 @@ def cts2gedtsv(cts, gedtsv):
                 sentence.append((token, 'c'))
                 good_count +=1
 
-
-    print("\n")
     print("good_count:", good_count)
     print("sub_count:", sub_count)
     print("ins_count:", ins_count)
@@ -191,11 +212,20 @@ def cts2gedtsv(cts, gedtsv):
     print("%del = {:.2f}".format(del_count/good_count*100))
 
 def main():
+    if(len(sys.argv) != 2):
+        print("Usage: python3 cts2gedtsv.py [unigram/bigram]")
+        return
+
+    model_type = sys.argv[1].lower()
+
+    if model_type not in ['unigram', 'bigram']:
+        print("model type error")
+        return
+
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts5"
-    cts2gedtsv(path1,path2)
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4.bigram"
+    cts2gedtsv(path1, path2, model_type)
 
 
 if __name__ == "__main__":
-    if(len(sys.argv) == 1):
-        main()
+    main()
