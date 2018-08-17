@@ -85,7 +85,7 @@ class BigramModel(object):
                 sum_prob += prob
                 self.transition_probs[(bigram1,bigram2)] = prob
                 self.pmf[bigram1].append(prob)
-            # this sum_prob is the probability that the word changes
+            # this sum_prob is the probability that the bigram changes
             # so if it is more than one, something went wrong => do not build the pmf
             if sum_prob > 1.0:
                 self.transition_probs[(bigram1,bigram1)] = 0
@@ -99,4 +99,37 @@ class BigramModel(object):
 
     # Propagate error
     def emit(self, bigram, gain=None):
-        pass
+        """
+        Emit a bigram according to the probability distribution
+        of the bigram model
+        e.g. P((I,sing)->(I,sings)) = 0.05
+
+        => gain: pmf'(!same) = min[gain x pmf(!same), 1]
+                 pmf'(same)  = 1 - pmf'(!same)
+        """
+        if bigram not in self.pmf:
+            return bigram
+        else:
+            if gain == None:
+                # try:
+                bigrams_list = [bigram]+self.bigrams_dict[bigram]
+                x = np.random.choice(range(len(bigrams_list)), size=1, p=self.pmf[bigram])
+                # except ValueError:
+                #     print("PMF-ERROR: {} - sum(pmf) = {}, pmf = {}".format(bigram, sum(self.pmf[bigram]),self.pmf[bigram]))
+                #     return bigram
+            else:
+                new_pmf = []
+                boosted = [gain * p for p in self.pmf[bigram][1:]]
+                if sum(boosted) < 1.0:
+                    new_pmf.append(1.0-sum(boosted))
+                    new_pmf += boosted
+
+                else: # gain is too large
+                    factor = 1.0 / sum(self.pmf[bigram][1:])
+                    new_pmf.append(0.0)
+                    new_pmf += [factor * p for p in self.pmf[bigram][1:]]
+
+                bigrams_list = [bigram]+self.bigrams_dict[bigram]
+                x = np.random.choice(range(len(bigrams_list)), size=1, p=new_pmf)
+
+        return bigrams_list[x[0]]
