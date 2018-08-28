@@ -20,7 +20,7 @@ def ami2gedtsv(ami, gedtsv, model_type):
                 6. remove special tokens
     work3:    more complicated text processing
                 ### 1. US spelling => UK spelling !!! DTAL has both spelling
-                2. Tokenisation e.g. don't => do n't // it's => it 's
+                2. Tokenisation e.g. don't => do not // can't => can not
     ged.tsv:  corrput the corpus using statistics from the model
     """
 
@@ -110,15 +110,23 @@ def ami2gedtsv(ami, gedtsv, model_type):
             word = line.strip()
 
             # US to UK spelling
-            word = us_to_uk_spelling(word) #version4
+            # word = us_to_uk_spelling(word) #version4
 
             # tokenisation
+            # if "'" in word:
+            #     words = split_word(word)
+            #     for word in words:
+            #         file.write("{}\n".format(word))
+            #     continue
             if "'" in word:
-                words = split_word(word)
-                for word in words:
-                    file.write("{}\n".format(word))
-                continue
-
+                if word in glm_mapping_kmk:
+                    words = glm_mapping_kmk[word]
+                    print("{}   =>  {}".format(word, words))
+                    for word in words:
+                        file.write("{}\n".format(word))
+                    continue
+                else:
+                    pass
             file.write("{}\n".format(word))
 
     print("{} done".format(myoutput[2]))
@@ -128,7 +136,7 @@ def ami2gedtsv(ami, gedtsv, model_type):
     with open(myoutput[2], 'r') as file:
         lines = file.readlines()
 
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-24082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     # ----- Model selection ----- #
     # Unigram
@@ -260,7 +268,7 @@ def main():
         return
 
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami4.bigram"
+    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami6"
     ami2gedtsv(path1, path2, model_type)
 
 
