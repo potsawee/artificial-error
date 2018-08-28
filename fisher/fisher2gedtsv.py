@@ -1,6 +1,7 @@
 import sys
-from unigram import UnigramModel
+from sequencemodel import UnigramModel
 from data_processing import *
+from tqdm import tqdm
 
 def fisher2gedtsv(fisher, gedtsv):
     """
@@ -36,15 +37,9 @@ def fisher2gedtsv(fisher, gedtsv):
     with open(myoutput[0], 'w') as file:
 
         print("processing {}".format(myoutput[0]))
-        print("len(lines) =", len(lines))
-        print("{}|100%".format(' '*int(len(lines)/50000)))
 
-        for j, line in enumerate(lines):
-            # counting
-            if j % 50000 == 0:
-                print('#', end='')
-                sys.stdout.flush()
-
+        for idx in tqdm(range(len(lines))):
+            line = lines[idx]
 
             items = line.split()
             for token in items[1:]:
@@ -108,12 +103,20 @@ def fisher2gedtsv(fisher, gedtsv):
             # word = us_to_uk_spelling(word)
 
             # tokenisation
+            # if "'" in word:
+            #     words = split_word(word)
+            #     for word in words:
+            #         file.write("{}\n".format(word))
+            #     continue
             if "'" in word:
-                words = split_word(word)
-                for word in words:
-                    file.write("{}\n".format(word))
-                continue
-
+                if word in glm_mapping_kmk:
+                    words = glm_mapping_kmk[word]
+                    print("{}   =>  {}".format(word, words))
+                    for word in words:
+                        file.write("{}\n".format(word))
+                    continue
+                else:
+                    pass
             file.write("{}\n".format(word))
 
     print("{} done".format(myoutput[1]))
@@ -124,7 +127,7 @@ def fisher2gedtsv(fisher, gedtsv):
     with open(myoutput[1], 'r') as file:
         lines = file.readlines()
 
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-24082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     model = UnigramModel()
     model.readin(gedx_path)
@@ -141,15 +144,9 @@ def fisher2gedtsv(fisher, gedtsv):
     del_count = 0
     good_count = 0
 
-    print("len(lines) =", len(lines))
-    print("{}|100%".format(' '*int(len(lines)/500000)))
-
-    for j, line in enumerate(lines):
-
-        # counting
-        if j % 500000 == 0:
-            print('#', end='')
-            sys.stdout.flush()
+    print("Propagating the errors...")
+    for idx in tqdm(range(len(lines))):
+        line = lines[idx]
 
         if line == '\n':
             sentences.append(sentence)
@@ -225,7 +222,7 @@ def fisher2gedtsv(fisher, gedtsv):
 
 def main():
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/work15082018/fisher-all.txt"
-    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/fisher2v2"
+    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/fisher6"
     fisher2gedtsv(path1,path2)
 
 

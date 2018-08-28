@@ -74,15 +74,23 @@ def cts2gedtsv(cts, gedtsv, model_type):
             word = line.strip()
 
             # US to UK spelling
-            word = us_to_uk_spelling(word) #version4
+            # word = us_to_uk_spelling(word) #version4
 
             # tokenisation
+            # if "'" in word:
+            #     words = split_word(word)
+            #     for word in words:
+            #         file.write("{}\n".format(word))
+            #     continue
             if "'" in word:
-                words = split_word(word)
-                for word in words:
-                    file.write("{}\n".format(word))
-                continue
-
+                if word in glm_mapping_kmk:
+                    words = glm_mapping_kmk[word]
+                    print("{}   =>  {}".format(word, words))
+                    for word in words:
+                        file.write("{}\n".format(word))
+                    continue
+                else:
+                    pass
             file.write("{}\n".format(word))
 
     print("{} done".format(myoutput[1]))
@@ -93,7 +101,7 @@ def cts2gedtsv(cts, gedtsv, model_type):
     with open(myoutput[1], 'r') as file:
         lines = file.readlines()
 
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-24082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     # ----- Model selection ----- #
     # Unigram
@@ -223,7 +231,7 @@ def main():
         return
 
     path1 = "/home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text"
-    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts4.bigram"
+    path2= "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/cts-work/cts6"
     cts2gedtsv(path1, path2, model_type)
 
 
