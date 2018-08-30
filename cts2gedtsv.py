@@ -125,7 +125,7 @@ def cts2gedtsv(cts, gedtsv, model_type):
     if model_type == 'unigram':
 
         target_stat = UnigramCount()
-        target_stat.readfile(myoutput[2])
+        target_stat.readfile(myoutput[1])
         # if P(w1 -> w2) * count_target(w1) > count_target(w2)
         # reduce P(w1 -> w2) to  count_target(w2) / count_target(w1)
         # re-adjust the pmf[w1] i.e. increase P(w1 -> w1) so that the sum is 1.0
