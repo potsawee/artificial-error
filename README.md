@@ -42,7 +42,7 @@ This script makes use of the following file
 	the		the			c
 	centre		centre			c
 	
-To convert gedx.tsv to gedx.ins.tsv - the input/output are defined in sequencemodel.py, run:
+To convert *gedx.tsv* to *gedx.ins.tsv* - the input/output are defined in **sequencemodel.py**, run:
 
 	python3 sequencemodel.py ins
 	
