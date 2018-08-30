@@ -83,6 +83,8 @@ Run:
 
 	python3 fisher/fisher2gedtsv.py
 
+*Only the unigram model is currently implemented!*
+
 Setting:
 
 - path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/work15082018/fisher-all.txt"
