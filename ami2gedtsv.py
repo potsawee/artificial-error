@@ -1,10 +1,10 @@
 import sys
 from sequencemodel import UnigramModel
 from sequencemodel import BigramModel
+from sequencemodel import UnigramCount
 from data_processing import *
 from string import punctuation
 from tqdm import tqdm
-
 
 def ami2gedtsv(ami, gedtsv, model_type):
     """
@@ -153,6 +153,84 @@ def ami2gedtsv(ami, gedtsv, model_type):
     model.construct_model()
     print("Model built!")
 
+    # ---------- Read the statistics of the AMI corpus --------- #
+    # @potsawee - 28 August 2018
+    # only support unigram model!
+    if model_type == 'unigram':
+
+        target_stat = UnigramCount()
+        target_stat.readfile(myoutput[2])
+        # if P(w1 -> w2) * count_target(w1) > count_target(w2)
+        # reduce P(w1 -> w2) to  count_target(w2) / count_target(w1)
+        # re-adjust the pmf[w1] i.e. increase P(w1 -> w1) so that the sum is 1.0
+
+        count_not_in_model = 0
+        count_err_too_high = 0
+        count_err_okay = 0
+
+        for w1 in target_stat.words_count:
+            if w1 not in model.words_dict:
+                count_not_in_model += 1
+                continue
+
+            transition_prob_changed = False
+
+            for w2 in model.words_dict[w1]:
+                # INSERTION / DELETION => do not change the transition prob!
+                if len(w2.split()) > 1 or '*' in w2:
+                    pass
+                # SUBSTITUTION
+                else:
+                    if w2 in target_stat.words_count:
+                        target_w2_count = target_stat.words_count[w2]
+                    else:
+                        target_w2_count = 0
+                    if model.transition_probs[(w1,w2)] * target_stat.words_count[w1] > 0.1 * target_w2_count:
+                        model.transition_probs[(w1,w2)] = 0.1 * target_w2_count / target_stat.words_count[w1]
+                        transition_prob_changed = True
+            if transition_prob_changed:
+                new_pmf = []
+                for w2 in model.words_dict[w1]:
+                    new_pmf.append(model.transition_probs[(w1,w2)])
+                new_pmf = [1-sum(new_pmf)] + new_pmf
+                model.pmf[w1] = new_pmf
+                count_err_too_high += 1
+            else:
+                count_err_okay += 1
+
+            # TODO: Fix how the corpus is corrupted here!
+            ### w0 -> w1
+            ### w1 -> w2
+            # if w1 not in model.words_dict:
+            #     count_not_in_model += 1
+            #     continue
+            # transition_prob_changed = False
+            # for w2 in model.words_dict[w1]:
+            #     # INSERTION / DELETION => do not change the transition prob!
+            #     if len(w2.split()) > 1 or '*' in w2:
+            #         pass
+            #     # SUBSTITUTION
+            #     else:
+            #         if w2 in target_stat.words_count:
+            #             target_w2_count = target_stat.words_count[w2]
+            #         else:
+            #             target_w2_count = 0
+            #         sum_prob_w_r = 0
+            #         expected_err = 0
+            #         for w_r in model.rev_words_dict[w2]:
+            #             sum_prob_w_r += model.transition_probs[(w_r, w2)]
+            #             if w_r not in target_stat.words_count:
+            #                 tgt_word_count_w_r = 0
+            #             else:
+            #                 tgt_word_count_w_r = target_stat.words_count[w_r]
+            #             expected_err += model.transition_probs[(w_r,w2)] * tgt_word_count_w_r
+
+        print("Error exploding problem checked!")
+        print("Count word not in the model:   ", count_not_in_model)
+        print("Count word prob being too high:", count_err_too_high)
+        print("Count word prob being okay:    ", count_err_okay)
+    # --------------------------------------------------- #
+
     sentences = []
     sentence = [] # start with a word, end with a full stop
                   # [('the', 'c'), ('cat', 'c'), ...]
@@ -238,7 +316,10 @@ def ami2gedtsv(ami, gedtsv, model_type):
                 if word[0] != deletion:
                     file.write("{}\t{}\n".format(word[0], word[1]))
                 else:
-                    idx += 1
+                    while sentence[idx][0] == deletion:
+                        idx += 1
+                        if idx == len(sentence):
+                            break
                     if(idx < len(sentence)):
                         word = sentence[idx]
                         file.write("{}\ti\n".format(word[0]))
@@ -268,7 +349,7 @@ def main():
         return
 
     path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-train+sil.mlf"
-    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami6"
+    path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/ami-work/ami7-2"
     ami2gedtsv(path1, path2, model_type)
 
 
