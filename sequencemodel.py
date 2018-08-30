@@ -9,6 +9,7 @@ class UnigramModel(object):
         self.words_count = {}       # words_count[have] = 100
         self.pairs_count = {}       # pairs_count[(have,had)] = 20
         self.words_dict = {}        # words_dict[have] = [has, had, ****, ...]  ... not contain itself
+        # self.rev_words_dict = {}    # rev_words_dict[staff] = [stuff, staffs, is] ... reverse dict showing all the words that can go to 'staff'... contain itself... has insertion
         self.transition_probs = {}  # transition_probs[(have,had)] = P(have->had) = 0.2
         self.pmf = {}               # pmf[have] = [P(have->have), P(have->each word in word dict)] ... sum this must be 1
         self.filepath = None
@@ -62,6 +63,14 @@ class UnigramModel(object):
                 else:
                     if h not in self.words_dict[r]:
                         self.words_dict[r].append(h)
+
+            # -------- reverse words dict --------- #
+            # if h not in self.rev_words_dict:
+            #     self.rev_words_dict[h] = [r]
+            # else:
+            #     if r not in self.rev_words_dict[h]:
+            #         self.rev_words_dict[h].append(r)
+            # ------------------------------------ #
 
     def build_transition_probs(self):
         for w1, v in self.words_dict.items():
