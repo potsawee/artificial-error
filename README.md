@@ -105,7 +105,7 @@ Once all the directories are processed in step 1:
 	
 Other Tools
 --------------------------------------
-- **split_data.py**: Once ami2gedtsv.py generates .ged.tsv file, this script will prepare train/dev/test sets in the TLC format.  
+- **split_data.py**: Once ami2gedtsv.py has generated .ged.tsv file, this script prepares train/dev/test sets in the TLC format.  
 	
 	Run:
 	 
