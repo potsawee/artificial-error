@@ -1,9 +1,16 @@
 """
-Convert from inc/spell/corr
-To stm
+Convert from inc/spell/corr to stm
 E.g.
 (1) AU*111*0265*0381*2000*42-1-1 From the chart we can see the difference between the levels of participation in education and science between developing countries and industrialised countries from 1980 to 1990 .
 (stm) ID 1 aggregate 0.000 80.000 ..........
+
+Args:
+    orig: inc/spell/corr file in the /home/alta/CLC/exams/LNRC/*/*.(inc/spell/corr)
+    stm: output file name
+
+Output:
+    stm format the specified location
+
 """
 
 import sys
