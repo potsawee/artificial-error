@@ -46,13 +46,35 @@ To convert *gedx.tsv* to *gedx.ins.tsv* - the input/output are defined in **sequ
 
 	python3 sequencemodel.py ins
 	
-Corrupt native-speech corpora
+Native-speech Corpora
 --------------------------------------
-### Native-Speech Corpora
 - AMI	~ 2M
 - Switchboard ~ 3.1M
 - Fisher ~ 35.1M
 
+### AMI
+- /home/dawna/meetings/ami/convert/lib/mlfs/train+sil.mlf
+- The processing steps are carried out in ami2gedtsv.py
+
+### Switchboard CTS
+- /home/nst/yq236/tools/kaldi-trunk-git/egs/swbd/s5c/data/train/text
+- The processing steps are carried out in cts2gedtsv.py
+
+### Fisher CTS
+- /home/alta/CTS/Fisher
+- Need to extract the transcriptions
+
+Run to process each directory for LDC/BBN:
+
+	./fisher/run-step1ldc.sh transcr tgtdir tgtname
+	./fisher/run-step1bbn.sh transcr tgtdir tgtname
+
+Once all the directories are processed in step 1:
+
+	./fisher/run-step2.sh
+	
+Corrupt / Inject Errors
+--------------------------------------
 ### sequencemodel.py
 This Python scrips provides classes for Unigram / Bigram models which are used in ami2gedtsv.py, cts2gedtsv.py, and fisher2gedtsv.py.
 
@@ -90,18 +112,6 @@ Setting:
 - path1 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/work15082018/fisher-all.txt"
 - path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/fisher6"
 - gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-24082018/master.gedx.ins.tsv"
-
-Process the Fisher Corpus
---------------------------------------
-
-Run to process each directory for LDC/BBN:
-
-	./fisher/run-step1ldc.sh transcr tgtdir tgtname
-	./fisher/run-step1bbn.sh transcr tgtdir tgtname
-
-Once all the directories are processed in step 1:
-
-	./fisher/run-step2.sh
 	
 Other Tools
 --------------------------------------
