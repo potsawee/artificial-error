@@ -78,7 +78,7 @@ Setting:
 - path2 = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/fisher/fisher6"
 - gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-24082018/master.gedx.ins.tsv"
 
-Processing the Fisher Corpus
+Process the Fisher Corpus
 --------------------------------------
 
 Run to process each directory for LDC/BBN:
