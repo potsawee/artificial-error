@@ -4,7 +4,7 @@ Artificial Grammatical Error
 
 Extract the CLC statistics
 --------------------------------------
-- ge-stat-experiment1.sh: To extract gedx file for any exam file  
+- **ge-stat-experiment1.sh**: To extract gedx file for any exam file  
 Usage: ./ge-stat-experiment1.sh exam file tgtdir  
 e.g.	 ./ge-stat-experiment1.sh IELTS 2000_42 tmp  
 This script makes use of the following file
@@ -19,14 +19,14 @@ This script makes use of the following file
 		 
 	e.g. ./run-ge-stat-experiment1.sh IELTS tmp
     
-- **combine_gedx.sh.sh**: To combine .gedx.tsv for all files in an exam into one file 
+- **combine_gedx.sh**: To combine .gedx.tsv for all files in an exam into one file 
 	Run: 
 	
 		./combine_gedx.sh.sh exam workdir tgt
 		 
 	e.g. ./combine_gedx.sh.sh IELTS tmp lib/gedx-tsv/work-16082018
 
-*gedx format* - files from different exams should be concatanated to make a **master.gedx.tsv**
+*gedx.tsv format* - files from different exams should be concatanated to make a **master.gedx.tsv**
 	
 	i       	i       		c  
 	am      	am      		c  
@@ -34,6 +34,17 @@ This script makes use of the following file
 	you     	you     		c
 	will    	will    		c
 	provide 	provide 		c
+	
+*gedx.ins.tsv* - this is the file that the Unigram/Bigram needs in order to corrput a native-speech corpus. It combines insertion errors to the previous words, or the following words if they appear at the beginning of sentences.
+
+	we		we			c
+	call		call	to		i
+	the		the			c
+	centre		centre			c
+	
+To convert gedx.tsv to gedx.ins.tsv - the input/output are defined in sequencemodel.py, run:
+
+	python3 sequencemodel.py ins
 	
 Corrupt native-speech corpora
 --------------------------------------
