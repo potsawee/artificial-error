@@ -24,10 +24,18 @@ echo "-----------------------------------------------------"
 echo "file: $ORIG"
 echo "-----------------------------------------------------"
 
-python3 $MAKESTM $ORIG.corr $TGT/file.corr.stm
+python3 $MAKESTM $ORIG.corr $TGT/file.corr0.stm
 echo "convert to stm done"
-python3 $MAKESTM $ORIG.spell $TGT/file.spell.stm
+python3 $MAKESTM $ORIG.spell $TGT/file.spell0.stm
 echo "convert to stm done"
+
+# mapping
+set MAPPING=/home/alta/BLTSpeaking/ged-pm574/artificial-error/scripts/mapping/map.sh
+$MAPPING $TGT/file.corr0.stm > $TGT/file.corr.stm
+$MAPPING $TGT/file.spell0.stm > $TGT/file.spell.stm
+echo "mapping stm done"
+
+
 awk -f $STM2CTM $TGT/file.spell.stm > $TGT/file.spell.ctm
 echo "convert to ctm done"
 
