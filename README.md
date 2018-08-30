@@ -35,7 +35,7 @@ This script makes use of the following file
 	will    	will    		c
 	provide 	provide 		c
 	
-Corrupt an error-free corpus
+Corrupt native-speech corpora
 --------------------------------------
 ### Native-Speech Corpora
 - AMI	~ 2M
