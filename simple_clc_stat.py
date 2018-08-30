@@ -1,12 +1,26 @@
+'''
+Print the error statistics of the CLC from .gedx.tsv file
+e.g. http://mi.eng.cam.ac.uk/raven/esol/ind_reports/pm574/UROP3/clc_stat.pdf
+
+Args:
+    - gedx_path: path to gedx_path
+    - [1/unigram/bigram]
+        - 1 = simple stat (word count, percentage error)
+        - unigram = unigram transition
+        - bigram = bigram transition
+Output:
+    - Print the statistics to the terminal
+'''
+
 import sys
-from unigram import *
-from bigram import *
-def stat1():
+from sequencemodel import *
+
+def stat1(path):
     """
     Word count, Percentage errors etc
     """
 
-    path = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.tsv'
+    # path = '/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.tsv'
 
     sub_count = 0
     ins_count = 0
@@ -43,11 +57,11 @@ def stat1():
     print("%ins = {:.2f}".format(ins_count/good_count*100))
     print("%del = {:.2f}".format(del_count/good_count*100))
 
-def stat2():
+def stat2(gedx_path):
     """
     Unigram transition statistics
     """
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    # gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     model = UnigramModel()
     model.readin(gedx_path)
@@ -64,12 +78,11 @@ def stat2():
         if i == 500:
             return
 
-def stat3():
+def stat3(gedx_path):
     """
     Bigram transition statistics
     """
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
-    gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    # gedx_path = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
     print("Loading... {}".format(gedx_path))
     model = BigramModel()
     model.readin(gedx_path)
@@ -78,25 +91,31 @@ def stat3():
 
     i = 0
     print("--------------------------------------------------------------------")
-    print("{:24} => {:24} : count".format('correct_bigram', 'incorrect_bigram'))
+    print("{:15}{:15} => {:15}: count".format('correct', 'incorrect', 'given_prev'))
+    print("e.g count(sing->sings | I)")
+    print("count #sing => #sings given that the previous word is I")
     print("--------------------------------------------------------------------")
-    for bigram_pair, count in sorted(model.bigram_pairs_count.items(), key=lambda x:x[1])[::-1]:
-        print("{:12}{:12} => {:12}{:12} : {}".format(bigram_pair[0][0], bigram_pair[0][1], bigram_pair[1][0], bigram_pair[1][1], count))
+    for pair, count in sorted(model.pairs_count.items(), key=lambda x:x[1])[::-1]:
+        bigram, word = pair
+        print("{:15} => {:15} | {:15} : {}".format(bigram[1], word, bigram[0], count))
         i += 1
         if i == 500:
             return
 
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 simple_clc_stat.py option")
+    if len(sys.argv) != 3:
+        print("Usage: python3 simple_clc_stat.py gedx_path [1/unigram/bigram]")
         return
-    option = sys.argv[1]
+
+    gedx_path = sys.argv[1]
+    option = sys.argv[2]
+
     if option == '1':
-        stat1()
+        stat1(gedx_path)
     elif option == 'unigram':
-        stat2()
+        stat2(gedx_path)
     elif option == 'bigram':
-        stat3()
+        stat3(gedx_path)
     else:
         print("option invalid")
 

@@ -23,41 +23,45 @@ class UnigramModel(object):
 
     def count_unigrams(self):
         with open(self.filepath, 'r') as file:
-            # reference word - correct
-            r = None
-            # hypothesis word - incorrect
-            h = None
-            # label
-            l = None
-            for idx, line in enumerate(file):
-                if line == '\n':
-                    continue
+            lines = file.readlines()
 
-                items = line.split('\t')
+        # reference word - correct
+        r = None
+        # hypothesis word - incorrect
+        h = None
+        # label
+        l = None
+        for idx in tqdm(range(len(lines))):
+            line = lines[idx]
 
-                try:
-                    r = items[0].lower()
-                    h = items[1].lower()
-                    l = items[-1].strip()
-                except:
-                    print(idx, line)
+            if line == '\n':
+                continue
 
-                if r not in self.words_count:
-                    self.words_count[r] = 1
+            items = line.split('\t')
+
+            try:
+                r = items[0].lower()
+                h = items[1].lower()
+                l = items[-1].strip()
+            except:
+                print(idx, line)
+
+            if r not in self.words_count:
+                self.words_count[r] = 1
+            else:
+                self.words_count[r] += 1
+
+            if l == 'i':
+                if (r,h) not in self.pairs_count:
+                    self.pairs_count[(r,h)] = 1
                 else:
-                    self.words_count[r] += 1
+                    self.pairs_count[(r,h)] += 1
 
-                if l == 'i':
-                    if (r,h) not in self.pairs_count:
-                        self.pairs_count[(r,h)] = 1
-                    else:
-                        self.pairs_count[(r,h)] += 1
-
-                    if r not in self.words_dict:
-                        self.words_dict[r] = [h]
-                    else:
-                        if h not in self.words_dict[r]:
-                            self.words_dict[r].append(h)
+                if r not in self.words_dict:
+                    self.words_dict[r] = [h]
+                else:
+                    if h not in self.words_dict[r]:
+                        self.words_dict[r].append(h)
 
     def build_transition_probs(self):
         for w1, v in self.words_dict.items():
@@ -262,7 +266,33 @@ class BigramModel(object):
 
         return x[0]
 
+class UnigramCount(object):
+    def __init__(self):
+        self.words_count = {} # words_count[staff] = 5000
+    def readfile(self, filepath):
+        with open(filepath, 'r') as file:
+            lines = file.readlines()
+
+        for idx in tqdm(range(len(lines))):
+            line = lines[idx]
+            if line == '\n':
+                continue
+
+            word = line.strip()
+            if word not in self.words_count:
+                self.words_count[word] = 1
+            else:
+                self.words_count[word] += 1
+
+
 def handle_insertion(input, output):
+    '''
+    to convert from .gedx.tsv to .gedx.ins.tsv
+    this is mainly to do with combine insertion to the word nearby
+    Args:
+        - input:  .gedx.tsv
+        - output: .gedx.ins.tsv
+    '''
     lines = []
     with open(input, 'r') as file:
         in_lines = file.readlines()
@@ -294,8 +324,8 @@ def handle_insertion(input, output):
             file.write(line)
 
 def ins():
-    input = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.tsv"
-    output = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/lib/gedx-tsv/work-14082018/master.gedx.ins.tsv"
+    input = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/work-24082018/master.gedx.tsv"
+    output = "/home/alta/BLTSpeaking/ged-pm574/artificial-error/work-24082018/master.gedx.ins.tsv"
     handle_insertion(input, output)
 
 def main():
@@ -303,6 +333,8 @@ def main():
         return
     arg1 = sys.argv[1]
     if arg1 == 'ins':
+        print("handling insertion...")
         ins()
+
 if __name__ == "__main__":
     main()
