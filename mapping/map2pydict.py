@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 he'd he had         => "he'd": ['he', 'had'],
 how'd how had       => "how'd": ['how', 'had'],

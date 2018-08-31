@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import sys
 from sequencemodel import UnigramModel
 from sequencemodel import BigramModel

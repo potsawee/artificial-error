@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 '''
 Print the error statistics of the CLC from .gedx.tsv file
 e.g. http://mi.eng.cam.ac.uk/raven/esol/ind_reports/pm574/UROP3/clc_stat.pdf

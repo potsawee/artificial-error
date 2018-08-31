@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Convert from inc/spell/corr to stm
 E.g.
