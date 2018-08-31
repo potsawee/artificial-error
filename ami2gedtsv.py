@@ -154,7 +154,7 @@ def ami2gedtsv(ami, gedtsv, model_type):
     model.construct_model()
     print("Model built!")
 
-    # ---------- Read the statistics of the AMI corpus --------- #
+    # ------- Balancing distributions for words across CLC/Speech  ------ #
     # @potsawee - 28 August 2018
     # only support unigram model!
     if model_type == 'unigram':
@@ -230,7 +230,7 @@ def ami2gedtsv(ami, gedtsv, model_type):
         print("Count word not in the model:   ", count_not_in_model)
         print("Count word prob being too high:", count_err_too_high)
         print("Count word prob being okay:    ", count_err_okay)
-    # --------------------------------------------------- #
+    # ------------------------------------------------------------------ #
 
     sentences = []
     sentence = [] # start with a word, end with a full stop
