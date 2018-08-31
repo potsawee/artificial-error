@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 """
 Step 1 LDC:
     - Transcripts come from either LDC or BBN/WordWave => This script works with LDC
