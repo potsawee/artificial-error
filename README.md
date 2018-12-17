@@ -125,6 +125,11 @@ Other Tools
 	
 - **data_processing.py**: Processing done to AMI/Switchboard are manually defined in this file e.g. python dictionary for mapping
 
+- **gedx-info.py**: Print the substitution, insertion, deletion statistics of a gedx file
+	
+	Run:
+	 
+		python3 gedx-info.py gedx_path
 		
 
 
