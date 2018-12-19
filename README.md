@@ -121,7 +121,7 @@ Other Tools
 	 
 		python3 split_data.py orig tgt name
 		
-	e.g. python3 split_data.py lib/ami-work/ami6.ged.tsv lib/tsv ami6
+	e.g. python3 split_data.py lib/ami-work/ami6.ged.tsv lib/tsv/ ami6
 	
 - **data_processing.py**: Processing done to AMI/Switchboard are manually defined in this file e.g. python dictionary for mapping
 
