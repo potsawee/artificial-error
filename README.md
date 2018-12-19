@@ -131,6 +131,11 @@ Other Tools
 	 
 		python3 gedx-info.py gedx_path
 		
+- **gedx2gedtsv.py**: Convert gedx file (e.g. corrupted by an NMT system) to ged.tsv file for training sequence labeller
+	
+	Run:
+	 
+		python3 gedx2gedtsv.py gedx_path		
 
 
 
